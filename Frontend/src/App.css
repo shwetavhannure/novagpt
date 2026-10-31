@@ -1,0 +1,94 @@
+* {
+    font-family: Roboto, 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-app);
+    color: var(--text);
+}
+
+/* App shell: sidebar + chat workspace.
+   100% / 100dvh (not 100vw / 100vh) so there is no phantom horizontal scrollbar
+   and the mobile browser address bar does not cut off the input box. */
+.app {
+    background-color: var(--bg-app);
+    color: var(--text);
+    display: flex;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Dark backdrop behind the mobile sidebar drawer */
+.sidebarBackdrop {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .sidebarBackdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.65);
+        backdrop-filter: blur(2px);
+        z-index: 190;
+        animation: backdropFade 0.2s ease-out;
+    }
+}
+
+@keyframes backdropFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Logout transition screen: same slate background as the rest of the app */
+.logoutOverlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    background-color: var(--bg-app);
+    color: var(--text);
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.logoutContent {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Left-to-right shimmer / sweeping wave effect */
+.logoutTitleWave,
+.logoutSubtitleWave {
+    font-weight: 400;
+    background: linear-gradient(90deg, var(--text-dim) 0%, var(--text) 50%, var(--text-dim) 100%);
+    background-size: 200% auto;
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: leftToRightWave 2s linear infinite;
+}
+
+.logoutTitleWave {
+    font-size: 16px;
+}
+
+.logoutSubtitleWave {
+    font-size: 13px;
+    animation-delay: 0.3s;
+}
+
+@keyframes leftToRightWave {
+    0% { background-position: 200% center; }
+    100% { background-position: -200% center; }
+}

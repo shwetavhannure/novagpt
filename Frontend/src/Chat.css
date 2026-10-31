@@ -1,0 +1,228 @@
+.chats {
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;              
+    padding: 1.5rem 0;
+    box-sizing: border-box;
+}
+
+.emptyChatsViewport {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.chats::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chats::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chats::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.chats::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.newChatContainer,
+.userDiv,
+.gptDiv,
+.loaderDiv {
+    max-width: 720px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    box-sizing: border-box;
+}
+
+/* Strictly Centered Welcome Viewport */
+.newChatContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: auto;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 680px;
+}
+
+.newChatTitle {
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+    text-align: center;
+}
+
+.newChatSubtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0 auto 2rem;
+    max-width: 440px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* Quick Starter Suggestion Cards - Strictly Centered */
+.suggestionGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.suggestionCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 12px 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.suggestionCard:hover {
+    background: rgba(51, 156, 255, 0.08);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.suggestionTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.suggestionTitle i {
+    color: var(--accent);
+    font-size: 12px;
+}
+
+.suggestionDesc {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    line-height: 1.4;
+}
+
+/* User & GPT Message Bubbles */
+.userDiv {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 0.92rem;
+    margin-bottom: 16px;
+}
+
+.userMessage {
+    background-color: var(--bg-surface);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #f1f5f9;
+    padding: 12px 18px;
+    border-radius: 18px 18px 4px 18px;
+    max-width: 580px;
+    width: fit-content;
+    word-break: break-word;
+    text-align: left;
+    line-height: 1.55;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.gptDiv {
+    text-align: left;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    margin-bottom: 24px;
+    color: var(--text);
+    position: relative;
+}
+
+.gptDiv .katex-display {
+    margin: 1.8em 0 1.2em 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-top: 6px;
+}
+
+.loaderDiv {
+    display: flex;
+    justify-content: flex-start; 
+    margin-top: 10px;
+    margin-bottom: 25px;
+    padding-left: 1rem;
+}
+
+.hljs {
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border);
+}
+
+pre {
+    white-space: pre-wrap;
+    overflow-x: auto;
+    position: relative;
+    max-width: 100%;
+}
+
+/* Long words, URLs and wide tables must never create a page-level horizontal scrollbar */
+.gptDiv,
+.userMessage {
+    overflow-wrap: anywhere;
+}
+
+.gptDiv table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+@media (max-width: 600px) {
+    .suggestionGrid {
+        grid-template-columns: 1fr;
+    }
+    .newChatTitle {
+        font-size: 21px;
+    }
+    .newChatContainer,
+    .userDiv,
+    .gptDiv,
+    .loaderDiv {
+        padding-left: 0.9rem;
+        padding-right: 0.9rem;
+    }
+    .userMessage {
+        max-width: 92%;
+    }
+}
+/* Short screens (landscape phones): keep the welcome block from overflowing */
+@media (max-height: 560px) {
+    .newChatContainer { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .newChatTitle { font-size: 20px; margin-bottom: 4px; }
+    .newChatSubtitle { margin-bottom: 0.75rem; font-size: 13px; }
+    .suggestionGrid { gap: 8px; }
+}

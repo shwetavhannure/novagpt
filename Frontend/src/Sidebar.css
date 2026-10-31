@@ -1,0 +1,284 @@
+.sidebar {
+    background-color: var(--bg-sidebar);
+    color: var(--text-muted);
+    height: 100vh;
+    height: 100dvh;
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Top header: boxed container (logo left, icon buttons right) */
+.sidebarHeader {
+    padding: 12px;
+}
+
+.sidebarTopBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(2, 6, 23, 0.45);
+}
+
+.sidebarBrandLogo {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.sidebarHeaderLogoImg {
+    display: block;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 8px rgba(51, 156, 255, 0.35));
+    transition: transform 0.15s ease;
+}
+
+.sidebarBrandLogo:hover .sidebarHeaderLogoImg {
+    transform: scale(1.06);
+}
+
+.sidebarTopActions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.newChatTopIconBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 15px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.newChatTopIconBtn:hover {
+    background: var(--bg-hover);
+    color: #ffffff;
+}
+
+/* History list */
+.history {
+    margin: 0;
+    padding: 4px 12px 12px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    list-style: none;
+}
+
+.history::-webkit-scrollbar { width: 4px; }
+.history::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.historySectionHeader {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    padding: 8px 6px;
+    text-align: left;
+}
+
+.history li {
+    list-style-type: none;
+    cursor: pointer;
+    padding: 9px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    transition: background-color 0.15s ease, color 0.15s ease;
+    border: 1px solid transparent;
+    text-align: left;
+    min-width: 0;
+}
+
+.history li:hover {
+    background-color: var(--bg-hover);
+    color: #ffffff;
+}
+
+.history li.highlighted {
+    background-color: var(--accent-soft);
+    border-color: rgba(51, 156, 255, 0.25);
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.threadIcon {
+    font-size: 13px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    width: 15px;
+    text-align: center;
+}
+
+.history li.highlighted .threadIcon,
+.history li:hover .threadIcon {
+    color: var(--accent);
+}
+
+.threadTitleText {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+.history li .fa-trash {
+    opacity: 0;
+    position: absolute;
+    right: 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 4px;
+    transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.history li:hover .fa-trash,
+.history li.highlighted .fa-trash {
+    opacity: 1;
+}
+
+.history li .fa-trash:hover {
+    color: var(--danger) !important;
+}
+
+/* Touch screens have no hover: always show the delete icon */
+@media (hover: none) {
+    .history li .fa-trash { opacity: 0.8; }
+}
+
+.history li.emptyHistory {
+    color: var(--text-dim);
+    font-style: italic;
+    cursor: default;
+    font-size: 12px;
+}
+
+.history li.emptyHistory:hover {
+    background: transparent;
+    color: var(--text-dim);
+}
+
+/* Footer: prompt quota box + credit */
+.sidebarFooter {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.quotaBox {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.quotaBoxRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.quotaBoxLabel {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.quotaBoxValue {
+    color: #ffffff;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.quotaBar {
+    height: 4px;
+    background: var(--bg-app);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.quotaBarFill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.quotaBarFill.high {
+    background: var(--danger);
+}
+
+.sign {
+    font-size: 12px;
+    text-align: center;
+    color: var(--text-dim);
+    margin: 0;
+    width: 100%;
+}
+
+/* Tablet / phone: sidebar becomes a slide-over drawer above the chat */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 200;
+        width: min(300px, 85vw);
+        box-shadow: 8px 0 32px rgba(2, 6, 23, 0.6);
+        animation: drawerIn 0.22s ease-out;
+    }
+}
+
+@keyframes drawerIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+/* Tablets: slightly slimmer docked sidebar */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar { width: 236px; }
+}
+
+/* Landscape phones: keep header + footer compact so the history list still has room */
+@media (max-height: 480px) {
+    .sidebarHeader { padding: 8px; }
+    .sidebarFooter { padding: 8px; gap: 6px; }
+    .quotaBox { padding: 6px 10px; }
+}

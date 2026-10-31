@@ -1,0 +1,511 @@
+/* Split Screen Authentication Layout */
+.authContainer {
+    display: flex;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    background-color: var(--bg-app);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+/* Left Hero / Graphic Showcase Side */
+.authHeroSide {
+    flex: 1.1;          /* original proportions; the container height is fixed so it never shifts between pages */
+    min-width: 0;
+    position: relative;
+    background: radial-gradient(circle at 20% 30%, rgba(51, 156, 255, 0.12) 0%, transparent 60%),
+                radial-gradient(circle at 85% 75%, rgba(51, 156, 255, 0.06) 0%, transparent 50%),
+                var(--bg-app);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3.5rem 4rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    height: 100%;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Subtle decorative grid overlay that blends into the background */
+.authHeroSide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    pointer-events: none;
+}
+
+.heroBrand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 2;
+}
+
+.heroBrandLogo {
+    display: block;
+    flex-shrink: 0;
+}
+
+.heroBrandText {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+}
+
+.heroContent {
+    max-width: 520px;
+    z-index: 2;
+    margin: 2rem 0;
+}
+
+.heroHeading {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    color: #ffffff;
+    margin: 0 0 1rem 0;
+}
+
+.heroHeading span {
+    background: linear-gradient(135deg, var(--accent) 30%, #80c4ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.heroDescription {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin: 0 0 2rem 0;
+}
+
+/* Feature Showcase Cards */
+.heroFeatures {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.featureCard {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.featureCard:hover {
+    transform: translateX(4px);
+    border-color: rgba(51, 156, 255, 0.25);
+    background: rgba(51, 156, 255, 0.03);
+}
+
+.featureIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(51, 156, 255, 0.12);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.featureText h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f1f5f9;
+}
+
+.featureText p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.heroFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-dim);
+    z-index: 2;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Right Form Side - Blends seamlessly with left container */
+.authFormSide {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    padding: 1.5rem 2rem;
+    box-sizing: border-box;
+    background-color: var(--bg-app);
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.authFormSide::-webkit-scrollbar { width: 6px; }
+.authFormSide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+.authCard {
+    width: 100%;
+    max-width: 420px;
+    margin: auto;       /* centres vertically/horizontally; safely top-aligns when taller than the screen */
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+}
+
+.authHeader {
+    text-align: center;
+    margin-bottom: 1.8rem;
+}
+
+.authTitle {
+    color: var(--text);
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.5px;
+}
+
+.authSubtitle {
+    color: var(--text-muted);
+    font-size: 13.5px;
+    margin: 0;
+    line-height: 1.45;
+}
+
+/* Forms & Inputs */
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.inputLabel {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.inputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.inputWrapper input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inputWrapper input:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(51, 156, 255, 0.2);
+}
+
+.inputIcon {
+    position: absolute;
+    right: 14px;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.inputIcon:hover {
+    color: var(--accent);
+}
+
+/* Brand Primary Button (var(--accent)) */
+.brandPrimaryBtn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background-color: #3f6fb5;      /* calm steel blue */
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    box-shadow: none;
+}
+
+.brandPrimaryBtn:hover:not(:disabled) {
+    background-color: #36609f;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.brandPrimaryBtn:active:not(:disabled) {
+    background-color: #2f5389;
+}
+
+.brandPrimaryBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Social Google Button */
+.socialBtn {
+    width: 100%;
+    padding: 11px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background-color: var(--bg-input);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.socialBtn:hover {
+    background-color: var(--bg-surface);
+    border-color: var(--border);
+}
+
+/* Links & Brand Accents (var(--accent)) */
+.brandLink {
+    color: var(--accent);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.brandLink:hover {
+    color: #60b2ff;
+    text-decoration: underline;
+}
+
+.authDivider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--border);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin: 1.2rem 0;
+}
+
+.authDivider::before,
+.authDivider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid var(--border);
+}
+
+.authDivider span {
+    padding: 0 12px;
+}
+
+.authAlertError {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.authAlertSuccess {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #34d399;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .authHeroSide {
+        display: none;
+    }
+    .authFormSide {
+        flex: 1;
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .authFormSide {
+        padding: 1rem 0.75rem;
+        align-items: flex-start;
+    }
+    .authCard {
+        padding: 1.5rem 1.15rem;
+        margin-top: 1rem;
+        border-radius: 14px;
+    }
+    .authTitle {
+        font-size: 22px;
+    }
+    .inputWrapper input {
+        font-size: 16px;   /* no iOS zoom on focus */
+    }
+}
+
+/* Short laptop windows: tighten the cards so Sign-Up fits without scrolling */
+@media (min-width: 901px) and (max-height: 820px) {
+    .authFormSide { padding: 1rem 2rem; }
+    .authCard { padding: 1.5rem 2rem; }
+    .authHeader { margin-bottom: 1rem; }
+    .authSubtitle { margin-bottom: 0.5rem; font-size: 13px; }
+    .authTitle { font-size: 23px; }
+    .authForm { gap: 0.7rem; }
+    .authDivider { margin: 0.9rem 0; }
+}
+
+/* Short windows: tighten spacing only (all original callouts stay visible) */
+@media (min-width: 901px) and (max-height: 780px) {
+    .authHeroSide { padding-top: 1.75rem; padding-bottom: 1.5rem; }
+    .heroContent { margin: 1rem 0; }
+    .heroHeading { font-size: 34px; margin-bottom: 0.6rem; }
+    .heroDescription { margin-bottom: 1rem; font-size: 14px; line-height: 1.5; }
+    .heroFeatures { gap: 8px; }
+    .featureCard { padding: 8px 14px; }
+}
+@media (min-width: 901px) and (max-height: 640px) {
+    .heroDescription { display: none; }
+}
+
+@media (max-width: 900px) {
+    .authFormSide { padding: 1.25rem 1rem; }
+}
+
+/* Email verification step */
+.authEmailStrong {
+    color: var(--text);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.inputWrapper input.otpInput {
+    text-align: center;
+    font-size: 24px;
+    letter-spacing: 10px;
+    font-weight: 700;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.otpActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.otpLinkBtn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+.otpLinkBtn:hover:not(:disabled) { text-decoration: underline; }
+.otpLinkBtn:disabled { color: var(--text-dim); cursor: default; }
+
+.authCard { min-width: 0; }
+
+/* "Forgot password?" sits under the password field, right-aligned */
+.forgotRow {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+}
+
+.forgotRow .brandLink {
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+/* Brand row shown above the form only when the left panel is hidden (phones / small tablets) */
+.authMobileBrand {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .authFormSide { flex-direction: column; }
+    .authMobileBrand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        align-self: center;
+        padding: 0.5rem 0 0.25rem;
+        flex-shrink: 0;
+    }
+    .authMobileBrand span {
+        font-size: 20px;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.4px;
+    }
+}

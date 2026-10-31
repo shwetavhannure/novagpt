@@ -1,0 +1,66 @@
+/* Prompt Quota Banner */
+.quotaBanner {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    background: var(--bg-surface);
+    border: 1px solid rgba(51, 156, 255, 0.3);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 0 auto 12px;
+    max-width: 720px;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    animation: bannerSlideDown 0.25s ease-out;
+}
+
+@keyframes bannerSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.quotaBannerContent {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    text-align: left;
+}
+
+.quotaBannerIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(51, 156, 255, 0.12);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.quotaBannerText {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.quotaBannerTitle {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.45;
+}
+
+@media (max-width: 600px) {
+    .quotaBanner, .quotaBannerContainer { flex-wrap: wrap; gap: 8px; padding-left: 0.75rem; padding-right: 0.75rem; }
+}

@@ -1,0 +1,398 @@
+/* SaaS Settings Modal Styles - Left-aligned & Clean */
+.modalBackdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    box-sizing: border-box;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.settingsModalCard {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 650px;
+    max-height: 85vh;
+    max-height: min(85dvh, calc(100dvh - 40px));
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    animation: scaleUp 0.2s ease-out;
+    text-align: left;
+}
+
+@keyframes scaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.modalHeaderTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    text-align: left;
+}
+
+.modalCloseBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 18px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+}
+
+.modalCloseBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.settingsModalBody {
+    display: flex;
+    flex: 1;
+    min-height: 0;          /* lets the body shrink so the footer buttons are never pushed off-screen */
+    overflow: hidden;
+}
+
+.modalHeader,
+.modalFooter {
+    flex-shrink: 0;
+}
+
+@media (min-height: 700px) {
+    .settingsModalBody { min-height: 320px; }
+}
+
+/* Settings Nav Tabs */
+.settingsNav {
+    width: 175px;
+    background-color: var(--bg-input);
+    border-right: 1px solid var(--border);
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.settingsNavItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    transition: all 0.15s ease;
+}
+
+.settingsNavItem:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #f1f5f9;
+}
+
+.settingsNavItem.active {
+    background: rgba(51, 156, 255, 0.15);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.settingsNavItem i {
+    font-size: 15px;
+    width: 18px;
+    text-align: left;
+}
+
+/* Settings Content Pane - Left aligned */
+.settingsContent {
+    flex: 1;
+    padding: 1.5rem 2rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.tabPane {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    text-align: left;
+}
+
+.settingsSectionTitle {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.settingsField {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+}
+
+.settingsField label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    text-align: left;
+}
+
+.settingsField input,
+.settingsField select {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: left;
+}
+
+.settingsField input:focus,
+.settingsField select:focus {
+    border-color: var(--accent);
+}
+
+.settingsField input:disabled {
+    background: var(--bg-app);
+    color: var(--text-dim);
+    cursor: not-allowed;
+}
+
+/* Display-name field with inline edit button */
+.nameEditWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.nameEditWrap input {
+    width: 100%;
+    padding-right: 76px;
+}
+
+.nameEditWrap input:read-only {
+    cursor: default;
+    color: var(--text);
+}
+
+.nameEditWrap.editing input {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.nameEditWrap > .nameEditBtn,
+.nameEditActions {
+    position: absolute;
+    right: 6px;
+}
+
+.nameEditActions {
+    display: flex;
+    gap: 2px;
+}
+
+.nameEditBtn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nameEditBtn:hover:not(:disabled) {
+    background: var(--bg-hover);
+    color: #ffffff;
+}
+
+.nameEditBtn.confirm {
+    color: var(--accent);
+}
+
+.nameStatus {
+    font-size: 12px;
+    margin-top: 6px;
+}
+.nameStatus.ok { color: #34d399; }
+.nameStatus.bad { color: var(--danger); }
+
+/* Export buttons */
+.exportActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.exportBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+}
+
+.exportBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.exportHint {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    margin: 12px 0 0;
+    text-align: left;
+}
+
+@media (max-width: 600px) {
+    .exportBtn { width: 100%; justify-content: center; }
+}
+
+/* Footer Actions */
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg-input);
+}
+
+.btnSecondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btnSecondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.btnPrimary {
+    background: var(--accent);
+    border: none;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.15s;
+}
+
+.btnPrimary:hover {
+    background: var(--accent-hover);
+}
+
+@media (max-width: 600px) {
+    .modalBackdrop {
+        padding: 10px;
+    }
+    .settingsModalCard {
+        max-height: calc(100dvh - 20px);
+    }
+    .settingsModalBody {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+    .settingsNav {
+        width: 100%;
+        flex-direction: row;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+        padding: 0.5rem;
+        flex-shrink: 0;
+    }
+    .settingsNavItem {
+        width: auto;
+        white-space: nowrap;
+        padding: 8px 12px;
+    }
+    .settingsContent {
+        padding: 1rem;
+        overflow-y: visible;
+    }
+    .settingsField input,
+    .settingsField select {
+        font-size: 16px;   /* no iOS zoom */
+        width: 100%;
+    }
+    .modalFooter {
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* Landscape phones: compact header/footer so the content area keeps usable height */
+@media (max-height: 480px) {
+    .modalHeader { padding-top: 0.6rem; padding-bottom: 0.6rem; }
+    .modalFooter { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .settingsContent { padding: 0.75rem 1.25rem; }
+}

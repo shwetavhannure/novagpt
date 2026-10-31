@@ -1,0 +1,69 @@
+/* ==========================================================================
+   NovaGPT design tokens: Dark Slate / Charcoal Obsidian
+   Every screen (auth, sidebar, chat, modals, logout) reads from these
+   variables, so changing a colour here changes it everywhere.
+   ========================================================================== */
+:root {
+    --bg-app: #0F172A;          /* main workspace / page background */
+    --bg-sidebar: #0B1220;      /* sidebar, slightly deeper than the workspace */
+    --bg-surface: #1E293B;      /* cards, modals, dropdowns, input boxes */
+    --bg-input: #0F172A;        /* inputs that sit on top of a surface */
+    --bg-hover: rgba(148, 163, 184, 0.10);
+    --border: #334155;
+    --border-soft: rgba(51, 65, 85, 0.6);
+
+    --text: #F1F5F9;
+    --text-muted: #94A3B8;
+    --text-dim: #64748B;
+
+    --accent: #339cff;
+    --accent-hover: #2684e0;
+    --accent-soft: rgba(51, 156, 255, 0.14);
+    --danger: #f87171;
+
+    --shadow-lg: 0 16px 36px rgba(2, 6, 23, 0.55);
+}
+
+/* Optional themes from Settings > Appearance override the same tokens */
+.theme-oled {
+    --bg-app: #000000;
+    --bg-sidebar: #05080f;
+    --bg-surface: #111827;
+    --bg-input: #000000;
+    --border: #1f2937;
+}
+
+.theme-midnight {
+    --bg-app: #0b1120;
+    --bg-sidebar: #070d18;
+    --bg-surface: #172033;
+    --bg-input: #0b1120;
+    --border: #2a3a55;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-app);
+    color: var(--text);
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Inputs must never trigger iOS zoom or overflow their container */
+input, textarea, select, button {
+    font-family: inherit;
+    max-width: 100%;
+}
+
+img, svg {
+    max-width: 100%;
+}
