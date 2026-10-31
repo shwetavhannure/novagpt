@@ -89,7 +89,7 @@ const connectDB = async () => {
 // Start the server on port 5001
 const server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 NovaGPT Server running on http://localhost:${PORT}`);
-    const lan = getLanIpAddress();a
+    const lan = getLanIpAddress();
     if (lan) console.log(`📱 Reachable from your phone (same Wi-Fi): http://${lan}:${PORT}  (open the app at http://${lan}:5174)`);
     connectDB();
 });
