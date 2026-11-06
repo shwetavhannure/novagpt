@@ -1,8 +1,8 @@
 import "./Sidebar.css";
 import { useContext, useEffect } from "react";
 import { MyContext } from "./MyContext.jsx";
+import logo from "./assets/novagpt-logo.png";
 import { v1 as uuidv1 } from "uuid";
-import NovaLogo from "./NovaLogo.jsx";
 import { API_BASE_URL } from "./config.js";
 
 function Sidebar() {
@@ -147,7 +147,7 @@ function Sidebar() {
             <div className="sidebarHeader">
                 <div className="sidebarTopBar">
                     <div className="sidebarBrandLogo" onClick={createNewChat} title="NovaGPT">
-                        <NovaLogo size={30} className="sidebarHeaderLogoImg" />
+                        <img src={logo} alt="NovaGPT" className="sidebarHeaderLogoImg" />
                     </div>
                     <div className="sidebarTopActions">
                         <button
@@ -187,7 +187,10 @@ function Sidebar() {
                                 className="fa-solid fa-trash"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    deleteThread(thread.threadId);
+                                    // Chats are only ever removed by you: ask first so a mis-tap can't delete one
+                                    if (window.confirm(`Delete "${thread.title}"? This cannot be undone.`)) {
+                                        deleteThread(thread.threadId);
+                                    }
                                 }}
                                 title="Delete chat"
                             ></i>

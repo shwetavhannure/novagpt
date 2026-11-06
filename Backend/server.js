@@ -8,11 +8,15 @@ import chatRoutes from "./routes/chat.js";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
 import { getLanIpAddress } from "./utils/clientUrl.js";
+import { ensureChatsNeverExpire, logDatabaseTarget } from "./utils/dbSafety.js";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5174";
 const MONGO_CONNECTION_URI = process.env.MONGODB_URI || process.env.MONGO_URI || "mongodb://localhost:27017/novagpt_dummy";
+if (!process.env.MONGODB_URI && !process.env.MONGO_URI) {
+    console.warn("⚠️  MONGODB_URI is not set in Backend/.env, so a local test database is used. Set it so your chats always go to the same place.");
+}
 
 // CORS configuration supporting assigned frontend ports (5174, 5173, 3000)
 const isPrivateNetworkHost = (h) =>
@@ -80,6 +84,8 @@ const connectDB = async () => {
     try {
         await mongoose.connect(MONGO_CONNECTION_URI);
         console.log("✅ Successfully connected to MongoDB database!");
+        logDatabaseTarget();
+        await ensureChatsNeverExpire();
     } catch(err) {
         console.warn("⚠️ MongoDB connection notice: " + err.message);
         console.warn("   Make sure your local MongoDB service is running (e.g. `net start MongoDB`)");

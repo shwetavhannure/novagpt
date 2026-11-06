@@ -43,4 +43,6 @@ const ThreadSchema = new mongoose.Schema({
     }
 });
 
+// NOTE: never add `expires` / expireAfterSeconds here: it would make MongoDB delete old chats automatically.
+// Chats are removed only by DELETE /api/thread/:threadId (the delete button in the sidebar).
 export default mongoose.model("Thread", ThreadSchema);

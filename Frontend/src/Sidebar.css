@@ -35,9 +35,15 @@
 }
 
 .sidebarHeaderLogoImg {
+    width: 27px;
+    height: 27px;
+    box-sizing: border-box;
+    padding: 1px;                /* minimal gap between the flower and the circle */
+    border: 1.5px solid rgba(140, 200, 255, 0.85);
+    border-radius: 50%;
+    object-fit: contain;
     display: block;
     flex-shrink: 0;
-    filter: drop-shadow(0 0 8px rgba(51, 156, 255, 0.35));
     transition: transform 0.15s ease;
 }
 

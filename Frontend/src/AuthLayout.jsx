@@ -1,6 +1,6 @@
 import React from "react";
 import "./AuthSplitScreen.css";
-import NovaLogo from "./NovaLogo.jsx";
+import logo from "./assets/novagpt-logo.png";
 
 export default function AuthLayout({ children }) {
     return (
@@ -8,7 +8,7 @@ export default function AuthLayout({ children }) {
             {/* Left Hero Graphic Showcase */}
             <div className="authHeroSide">
                 <div className="heroBrand">
-                    <NovaLogo size={40} className="heroBrandLogo" />
+                    <img src={logo} alt="NovaGPT" className="heroBrandLogo" />
                     <span className="heroBrandText">NovaGPT</span>
                 </div>
 
@@ -72,7 +72,7 @@ export default function AuthLayout({ children }) {
             {/* Right Authentication Form Card */}
             <div className="authFormSide">
                 <div className="authMobileBrand">
-                    <NovaLogo size={32} />
+                    <img src={logo} alt="NovaGPT" className="heroBrandLogo" />
                     <span>NovaGPT</span>
                 </div>
                 {children}

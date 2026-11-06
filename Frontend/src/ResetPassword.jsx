@@ -9,6 +9,7 @@ export default function ResetPassword() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -86,7 +87,7 @@ export default function ResetPassword() {
                                 required
                                 style={{ paddingRight: "42px" }}
                             />
-                            <span 
+                            <span
                                 className="inputIcon"
                                 onClick={() => setShowPassword(!showPassword)}
                                 title={showPassword ? "Hide password" : "Show password"}
@@ -104,17 +105,29 @@ export default function ResetPassword() {
                         <label className="inputLabel">Confirm Password</label>
                         <div className="inputWrapper">
                             <input
-                                type={showPassword ? "text" : "password"}
+                                type={showConfirmPassword ? "text" : "password"}
                                 placeholder="Repeat new password"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
+                                style={{ paddingRight: "42px" }}
                             />
+                            <span
+                                className="inputIcon"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                title={showConfirmPassword ? "Hide password" : "Show password"}
+                            >
+                                {showConfirmPassword ? (
+                                    <i className="fa-regular fa-eye-slash"></i>
+                                ) : (
+                                    <i className="fa-regular fa-eye"></i>
+                                )}
+                            </span>
                         </div>
                     </div>
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         disabled={isLoading}
                         className="brandPrimaryBtn"
                     >
@@ -124,10 +137,7 @@ export default function ResetPassword() {
                                 <span>Updating Password...</span>
                             </>
                         ) : (
-                            <>
-                                <span>Save New Password</span>
-                                <i className="fa-solid fa-check"></i>
-                            </>
+                            <span>Save New Password</span>
                         )}
                     </button>
                 </form>
