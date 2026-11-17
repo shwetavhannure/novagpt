@@ -103,7 +103,7 @@ router.post("/chat", authMiddleware, async (req, res) => {
         // --- 3. GET AI ASSISTANT COMPLETION ---
         // The model picked in the UI (req.body.model) is used exactly; only the 3 valid Groq IDs are accepted.
         const activeModel = normalizeModel(model || user.preferences?.modelPreference);
-        const assistantReply = await getOpenAIAPIResponse(message, activeModel);
+        const assistantReply = await getOpenAIAPIResponse(message, activeModel, existingThread?.messages || []);
 
         // --- 4. PERSIST CONVERSATION IN THREAD ---
         const updatedThread = await Thread.findOneAndUpdate(

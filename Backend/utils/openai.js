@@ -134,7 +134,7 @@ export const generateThreadTitle = async (firstMessage) => {
  * Sends the user prompt to Groq using EXACTLY the model that was selected.
  * No silent fallback to other models: if Groq rejects the request, the real reason is returned to the UI.
  */
-const getOpenAIAPIResponse = async (message, requestedModel) => {
+const getOpenAIAPIResponse = async (message, requestedModel, conversationHistory = []) => {
     const apiKey = process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.trim();
 
     if (!apiKey || apiKey === "dummy_groq_api_key_here" || apiKey.includes("dummy")) {
@@ -142,6 +142,14 @@ const getOpenAIAPIResponse = async (message, requestedModel) => {
     }
 
     const selectedModel = normalizeModel(requestedModel);
+    // Keep the recent turns so short follow-ups ("explain that", "what about the other one?")
+    // are interpreted in the context of this thread. Only accept chat roles stored by our app.
+    const recentHistory = Array.isArray(conversationHistory)
+        ? conversationHistory
+            .slice(-20)
+            .filter(item => (item?.role === "user" || item?.role === "assistant") && typeof item.content === "string")
+            .map(item => ({ role: item.role, content: item.content }))
+        : [];
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
@@ -156,6 +164,7 @@ const getOpenAIAPIResponse = async (message, requestedModel) => {
                     role: "system",
                     content: `You are NovaGPT, a helpful AI assistant. Answer the user's actual question directly, with clear, accurate content and suitable markdown. Do not add an unsolicited introduction, disclaimer, preface, or sign-off about being NovaGPT, being an AI, your model, or your provider. In particular, never write phrases such as "Answering from the perspective of NovaGPT", "As NovaGPT", or "powered by ..." unless the user directly asks about your identity or model. Be truthful if directly asked: you are the assistant in the NovaGPT application, this chat uses the "${selectedModel}" model through Groq's API, and you are not ChatGPT or a GPT-4-based OpenAI assistant. Do not invent who developed the app; if asked and you lack verified information, say you don't know. Otherwise, keep the response focused only on the user's topic.`
                 },
+                ...recentHistory,
                 {
                     role: "user",
                     content: message
