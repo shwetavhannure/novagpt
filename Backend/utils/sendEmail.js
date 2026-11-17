@@ -35,7 +35,8 @@ const sendEmail = async (options) => {
                     },
                     to: [{ email: options.email }],
                     subject: options.subject,
-                    htmlContent: html
+                    htmlContent: html,
+                    ...(Array.isArray(options.tags) && options.tags.length ? { tags: options.tags } : {})
                 }),
                 signal: AbortSignal.timeout(providerTimeoutMs)
             });

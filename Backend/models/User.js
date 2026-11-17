@@ -15,6 +15,8 @@ const userSchema = new mongoose.Schema({
     emailVerifyExpires: { type: Date, default: null },
     emailVerifyAttempts: { type: Number, default: 0 },
     emailVerifyLastSent: { type: Date, default: null },
+    emailVerifyAttemptId: { type: String, default: null },
+    emailVerifyDeliveryStatus: { type: String, default: null },
     // Password reset fields
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },

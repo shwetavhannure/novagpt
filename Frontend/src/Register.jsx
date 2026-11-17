@@ -16,6 +16,7 @@ export default function Register({ onSwitchToSignIn, setIsAuthenticated }) {
     // Step 2: e-mail ownership check (6-digit code)
     const [step, setStep] = useState("details"); // "details" | "verify"
     const [pendingEmail, setPendingEmail] = useState("");
+    const [verificationAttemptId, setVerificationAttemptId] = useState("");
     const [code, setCode] = useState("");
     const [resendIn, setResendIn] = useState(0);
     const [devCode, setDevCode] = useState("");
@@ -25,6 +26,48 @@ export default function Register({ onSwitchToSignIn, setIsAuthenticated }) {
         const t = setTimeout(() => setResendIn((n) => n - 1), 1000);
         return () => clearTimeout(t);
     }, [resendIn]);
+
+    // Brevo reports nonexistent mailboxes asynchronously. Watch the current
+    // attempt and return to the signup form with an error if it hard-bounces.
+    useEffect(() => {
+        if (step !== "verify" || !verificationAttemptId) return;
+
+        let cancelled = false;
+        let timer;
+        const startedAt = Date.now();
+        const checkDelivery = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/verification-email-status`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ attemptId: verificationAttemptId })
+                });
+                if (!response.ok) throw new Error("Status request failed");
+                const data = await response.json();
+                if (cancelled) return;
+
+                if (data.status === "undeliverable") {
+                    setEmail(pendingEmail);
+                    setPendingEmail("");
+                    setVerificationAttemptId("");
+                    setCode("");
+                    setStep("details");
+                    setError("This email address was rejected as undeliverable. Check the spelling or use an email address you can access.");
+                    return;
+                }
+                if (data.status === "delivered" || Date.now() - startedAt >= 60000) return;
+            } catch {
+                if (cancelled || Date.now() - startedAt >= 60000) return;
+            }
+            if (!cancelled) timer = setTimeout(checkDelivery, 1500);
+        };
+
+        checkDelivery();
+        return () => {
+            cancelled = true;
+            clearTimeout(timer);
+        };
+    }, [step, verificationAttemptId, pendingEmail]);
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -57,6 +100,7 @@ export default function Register({ onSwitchToSignIn, setIsAuthenticated }) {
 
             // The server e-mailed a code: the account is created only after the person enters it
             setPendingEmail(data.email || email.trim().toLowerCase());
+            setVerificationAttemptId(data.attemptId || "");
             setDevCode(data.devCode || "");
             setCode("");
             setResendIn(30);
@@ -112,7 +156,17 @@ export default function Register({ onSwitchToSignIn, setIsAuthenticated }) {
                 body: JSON.stringify({ email: pendingEmail }),
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.message || "Could not resend the code.");
+            if (!response.ok) {
+                if (response.status === 422) {
+                    setEmail(pendingEmail);
+                    setPendingEmail("");
+                    setVerificationAttemptId("");
+                    setCode("");
+                    setStep("details");
+                }
+                throw new Error(data.message || "Could not resend the code.");
+            }
+            setVerificationAttemptId(data.attemptId || "");
             setDevCode(data.devCode || "");
             setSuccessMessage("A new code is on its way. Check your inbox and spam folder.");
             setResendIn(30);
@@ -139,7 +193,7 @@ export default function Register({ onSwitchToSignIn, setIsAuthenticated }) {
                     <h2 className="authTitle">{step === "verify" ? "Verify your email" : "Create account"}</h2>
                     <p className="authSubtitle">
                         {step === "verify"
-                            ? <>If <strong className="authEmailStrong">{pendingEmail}</strong> can receive email, a 6-digit code is on its way. Enter it below to finish creating your account. If it doesn’t arrive, check the address and spam folder, or use a different email.</>
+                            ? <>We sent a 6-digit code to <strong className="authEmailStrong">{pendingEmail}</strong>. Enter it below to finish creating your account.</>
                             : "Create your account to unlock intelligent conversational workflows and project acceleration."}
                     </p>
                 </div>
