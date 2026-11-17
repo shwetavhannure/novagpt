@@ -1,7 +1,7 @@
 import express from "express";
 import Thread from "../models/Thread.js";
 import User from "../models/User.js";
-import getOpenAIAPIResponse, { generateThreadTitle, normalizeModel } from "../utils/openai.js";
+import getOpenAIAPIResponse, { generateThreadTitle, getConversationStarterTitle, normalizeModel } from "../utils/openai.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import { getNextBlockResetTime, formatWaitTime, FREE_DAILY_LIMIT } from "../utils/quotaHelper.js";
 
@@ -94,10 +94,15 @@ router.post("/chat", authMiddleware, async (req, res) => {
         // --- 2. DYNAMIC AI TOPIC THREAD TITLING ---
         let existingThread = await Thread.findOne({ threadId, userId: req.userId });
         let threadTitle = existingThread ? existingThread.title : null;
+        const firstUserMessage = existingThread?.messages?.find(item => item.role === "user")?.content || message;
+        const starterTitle = getConversationStarterTitle(firstUserMessage);
 
-        // If this is a new thread (or untitled default), dynamically generate concise 3-4 word title
-        if (!existingThread || !threadTitle || threadTitle === "New Chat") {
-            threadTitle = await generateThreadTitle(message);
+        // Use neutral titles for vague openers, including existing threads whose model-generated
+        // title guessed a topic that was never mentioned (e.g. "listen" -> "Audio Playback Request").
+        if (starterTitle && threadTitle !== starterTitle) {
+            threadTitle = starterTitle;
+        } else if (!existingThread || !threadTitle || threadTitle === "New Chat") {
+            threadTitle = await generateThreadTitle(firstUserMessage);
         }
 
         // --- 3. GET AI ASSISTANT COMPLETION ---

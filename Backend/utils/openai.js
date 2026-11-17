@@ -22,6 +22,23 @@ export const normalizeModel = (model) => {
     return VALID_MODELS.includes(clean) ? clean : DEFAULT_MODEL;
 };
 
+/** Return a neutral title for openers that do not contain an actual topic. */
+export const getConversationStarterTitle = (message) => {
+    if (typeof message !== "string") return null;
+    const trimmed = message.trim();
+    if (!trimmed || trimmed.length > 24) return null;
+
+    if (/^(hi+|hello+|hey+|howdy|greetings|hola|good\s+(morning|afternoon|evening|day)|yo\b|sup\b|test\b|testing\b)[.!?,\s]*$/i.test(trimmed)) {
+        return "General Inquiries & Welcome";
+    }
+
+    const opener = trimmed.toLowerCase().replace(/[.!?,]+$/g, "").trim();
+    if (["listen", "okay", "ok", "sure", "wait", "look", "hey listen", "okay listen", "ok listen", "hold on", "one sec", "hmm", "umm", "well"].includes(opener)) {
+        return "General Conversation";
+    }
+    return null;
+};
+
 /**
  * Intelligent topic title generator to produce concise 3-4 word titles
  * even when the user inputs raw greetings like "Hiii", "hello", "hey", etc.
@@ -72,10 +89,9 @@ export const fallbackTitleGenerator = (message) => {
 export const generateThreadTitle = async (firstMessage) => {
     const trimmed = (firstMessage || "").trim();
 
-    // Fast check for common greetings to avoid unnecessary API roundtrips
-    if (/^(hi+|hello+|hey+|howdy|greetings|hola|yo\b|test\b)/i.test(trimmed) && trimmed.length < 20) {
-        return "General Inquiries & Welcome";
-    }
+    // Avoid asking a model to invent a topic for greetings and conversational openers.
+    const starterTitle = getConversationStarterTitle(trimmed);
+    if (starterTitle) return starterTitle;
 
     const apiKey = process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.trim();
 
