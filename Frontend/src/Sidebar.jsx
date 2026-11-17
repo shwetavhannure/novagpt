@@ -10,6 +10,7 @@ function Sidebar() {
         allThreads,
         setAllThreads,
         currThreadId,
+        threadDrafts,
         setNewChat,
         setPrompt,
         reply,
@@ -73,10 +74,11 @@ function Sidebar() {
     }, [currThreadId, reply]);
 
     const createNewChat = () => {
+        const newThreadId = uuidv1();
         setNewChat(true);
         setPrompt("");
         setReply(null);
-        setCurrThreadId(uuidv1());
+        setCurrThreadId(newThreadId);
         setPrevChats([]);
         closeDrawerOnMobile();
     };
@@ -87,6 +89,7 @@ function Sidebar() {
             return;
         }
         closeDrawerOnMobile();
+        setPrompt(threadDrafts[newThreadId] || "");
         setCurrThreadId(newThreadId);
 
         try {

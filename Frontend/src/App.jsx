@@ -51,6 +51,7 @@ function App() {
 
   // Chat application states
   const [prompt, setPrompt] = useState("");
+  const [threadDrafts, setThreadDrafts] = useState({});
   const [reply, setReply] = useState(null);
   const [currThreadId, setCurrThreadId] = useState(uuidv1());
   const [prevChats, setPrevChats] = useState([]);
@@ -58,6 +59,16 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [allThreads, setAllThreads] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
+
+  // Keep unsent composer text with its conversation instead of carrying it
+  // into whichever thread the user opens next.
+  useEffect(() => {
+    setThreadDrafts((drafts) => (
+      drafts[currThreadId] === prompt
+        ? drafts
+        : { ...drafts, [currThreadId]: prompt }
+    ));
+  }, [currThreadId, prompt]);
 
   // Usage quota state (20 messages per rolling 24-hour block)
   const [quota, setQuota] = useState({
@@ -162,6 +173,7 @@ function App() {
   const providerValues = {
     prompt,
     setPrompt,
+    threadDrafts,
     reply,
     setReply,
     currThreadId,
