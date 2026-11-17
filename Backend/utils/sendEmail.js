@@ -16,6 +16,9 @@ import nodemailer from "nodemailer";
  */
 const sendEmail = async (options) => {
     const html = options.html || `<p>${String(options.message || "").replace(/\n/g, "<br>")}</p>`;
+    // Keep requests bounded in serverless environments. A provider that stalls
+    // should not leave the browser waiting until the function itself times out.
+    const providerTimeoutMs = Number(process.env.EMAIL_TIMEOUT_MS) || 8000;
 
     // 1. Resend API
     const resendKey = process.env.RESEND_API_KEY && process.env.RESEND_API_KEY.trim();
@@ -32,7 +35,8 @@ const sendEmail = async (options) => {
                     to: options.email,
                     subject: options.subject,
                     html
-                })
+                }),
+                signal: AbortSignal.timeout(providerTimeoutMs)
             });
             if (res.ok) {
                 console.log("Email sent successfully via Resend!");
@@ -53,6 +57,9 @@ const sendEmail = async (options) => {
             const transporter = nodemailer.createTransport({
                 host: (process.env.SMTP_HOST || "smtp-relay.brevo.com").trim(),
                 port: Number(process.env.SMTP_PORT) || 587,
+                connectionTimeout: providerTimeoutMs,
+                greetingTimeout: providerTimeoutMs,
+                socketTimeout: providerTimeoutMs,
                 auth: { user: smtpUser, pass: smtpPass }
             });
 

@@ -344,21 +344,28 @@ router.post("/forgot-password", async (req, res) => {
         const frontendUrl = resolveClientBaseUrl(req);
         const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
 
+        let delivered = false;
         try {
-            await sendEmail({
+            delivered = await sendEmail({
                 email: user.email,
                 subject: "Password Reset Request - NovaGPT",
                 message: `Hi ${user.username},\n\nYou requested a password reset. Click the link below to reset your password (valid for 15 minutes):\n\n${resetLink}\n\nIf you didn't request this, please ignore this email.`
             });
-            res.status(200).json({ message: "Password reset link sent to your email." });
         } catch (mailErr) {
-            console.warn("Password reset email skipped:", mailErr.message);
-            // Never expose the reset link in the API response on a live server: anyone could take over the account.
-            const isProd = process.env.NODE_ENV === "production";
-            res.status(200).json(isProd
-                ? { message: "Password reset link sent to your email." }
-                : { message: "Password reset link generated (SMTP in mock mode).", resetLink });
+            console.error("Password reset email error:", mailErr.message);
         }
+
+        if (!delivered) {
+            // Do not leave a valid reset token behind when no email was sent.
+            user.resetPasswordToken = null;
+            user.resetPasswordExpires = null;
+            await user.save();
+            return res.status(503).json({
+                message: "We couldn't send the password reset email right now. Please try again later."
+            });
+        }
+
+        return res.status(200).json({ message: "Password reset link sent to your email." });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
