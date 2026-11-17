@@ -57,8 +57,8 @@ export default function AuthLayout({ children }) {
                                 <i className="fa-solid fa-shield-halved"></i>
                             </div>
                             <div className="featureText">
-                                <h4>Intelligent Quota Protection</h4>
-                                <p>20 prompts every 24 hours with an automatic quota reset.</p>
+                                <h4>Three AI Models to Choose From</h4>
+                                <p>Choose a fast model, one for complex tasks, or a safety-focused option.</p>
                             </div>
                         </div>
                     </div>
