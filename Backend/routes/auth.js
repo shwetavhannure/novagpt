@@ -68,20 +68,57 @@ const VERIFY_EMAIL_TAG_PREFIX = "novagpt_verify_";
 
 const hashCode = (code) => crypto.createHash("sha256").update(`${code}:${getJwtSecret()}`).digest("hex");
 
+const getBrevoDeliveryEvent = async (email, attemptId) => {
+    const apiKey = process.env.BREVO_API_KEY?.trim();
+    if (!apiKey) return null;
+
+    try {
+        const query = new URLSearchParams({ email, days: "1", limit: "100", sort: "desc" });
+        const response = await fetch(`https://api.brevo.com/v3/smtp/statistics/events?${query}`, {
+            headers: { accept: "application/json", "api-key": apiKey },
+            signal: AbortSignal.timeout(2500)
+        });
+        if (!response.ok) return null;
+
+        const { events = [] } = await response.json();
+        const expectedTag = `${VERIFY_EMAIL_TAG_PREFIX}${attemptId}`;
+        const matchingEvents = events.filter(event =>
+            String(event.email || "").trim().toLowerCase() === email && event.tag === expectedTag
+        );
+        if (matchingEvents.some(event => ["hard_bounce", "invalid_email", "invalid"].includes(String(event.event).toLowerCase()))) {
+            return "undeliverable";
+        }
+        if (matchingEvents.some(event => String(event.event).toLowerCase() === "delivered")) {
+            return "delivered";
+        }
+    } catch (err) {
+        console.warn("Could not check Brevo delivery status:", err.message);
+    }
+    return null;
+};
+
 const waitForVerificationDelivery = async (userId, attemptId) => {
-    // Brevo reports hard bounces asynchronously. Only wait when its webhook is configured.
-    if (!process.env.BREVO_WEBHOOK_TOKEN) return "pending";
-    const waitMs = Math.max(0, Number(process.env.EMAIL_DELIVERY_CHECK_MS) || 5000);
+    // Brevo reports delivery/bounces asynchronously; check its event API and optional webhook.
+    if (!process.env.BREVO_API_KEY && !process.env.BREVO_WEBHOOK_TOKEN) return "pending";
+    const waitMs = Math.max(0, Number(process.env.EMAIL_DELIVERY_CHECK_MS) || 8000);
     const deadline = Date.now() + waitMs;
 
     while (Date.now() < deadline) {
         const user = await User.findOne({ _id: userId, emailVerifyAttemptId: attemptId })
-            .select("emailVerifyDeliveryStatus");
+            .select("email emailVerifyDeliveryStatus");
         if (!user) return "unknown";
-        if (user.emailVerifyDeliveryStatus === "delivered" || user.emailVerifyDeliveryStatus === "undeliverable") {
-            return user.emailVerifyDeliveryStatus;
+        let status = user.emailVerifyDeliveryStatus;
+        if (status !== "delivered" && status !== "undeliverable") {
+            status = await getBrevoDeliveryEvent(user.email, attemptId) || status;
+            if (status === "delivered" || status === "undeliverable") {
+                await User.updateOne(
+                    { _id: userId, emailVerifyAttemptId: attemptId, isVerified: false },
+                    { $set: { emailVerifyDeliveryStatus: status } }
+                );
+            }
         }
-        await new Promise(resolve => setTimeout(resolve, 400));
+        if (status === "delivered" || status === "undeliverable") return status;
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
     return "pending";
 };
@@ -218,7 +255,13 @@ const handleRegisterUser = async (req, res) => {
         if (deliveryStatus === "undeliverable") {
             await User.deleteOne({ _id: user._id, emailVerifyAttemptId: attemptId, isVerified: false });
             return res.status(422).json({
-                message: "This email address was rejected as undeliverable. Check the spelling or use an email address you can access."
+                message: "This email address does not exist or cannot receive email. Check the spelling or use a different address."
+            });
+        }
+        if (process.env.BREVO_API_KEY && deliveryStatus !== "delivered") {
+            await User.deleteOne({ _id: user._id, emailVerifyAttemptId: attemptId, isVerified: false });
+            return res.status(503).json({
+                message: "We couldn't confirm that this inbox can receive email. Please try again shortly or use a different address."
             });
         }
 
@@ -226,7 +269,7 @@ const handleRegisterUser = async (req, res) => {
             message: `We sent a 6-digit code to ${normalizedEmail}.`,
             needsVerification: true,
             email: normalizedEmail,
-            attemptId: process.env.BREVO_WEBHOOK_TOKEN ? attemptId : null
+            attemptId: process.env.BREVO_API_KEY || process.env.BREVO_WEBHOOK_TOKEN ? attemptId : null
         });
     } catch (err) {
         console.error("Register error:", err);
@@ -246,9 +289,19 @@ router.post("/verification-email-status", async (req, res) => {
             return res.status(400).json({ message: "Invalid verification attempt." });
         }
         const user = await User.findOne({ emailVerifyAttemptId: attemptId, isVerified: false })
-            .select("emailVerifyDeliveryStatus");
+            .select("email emailVerifyDeliveryStatus");
         if (!user) return res.status(404).json({ status: "unknown" });
-        return res.json({ status: user.emailVerifyDeliveryStatus || "pending" });
+        let status = user.emailVerifyDeliveryStatus || "pending";
+        if (status === "pending") {
+            status = await getBrevoDeliveryEvent(user.email, attemptId) || status;
+            if (status !== "pending") {
+                await User.updateOne(
+                    { _id: user._id, emailVerifyAttemptId: attemptId, isVerified: false },
+                    { $set: { emailVerifyDeliveryStatus: status } }
+                );
+            }
+        }
+        return res.json({ status });
     } catch (err) {
         console.error("Verification delivery status error:", err.message);
         return res.status(500).json({ message: "Could not check email delivery status." });
@@ -266,7 +319,7 @@ router.post("/verify-email", async (req, res) => {
             return res.status(400).json({ message: "No pending verification for this email. Please sign up again." });
         }
         if (user.emailVerifyDeliveryStatus === "undeliverable") {
-            return res.status(422).json({ message: "This email address was rejected as undeliverable. Check the spelling or use a different email." });
+            return res.status(422).json({ message: "This email address does not exist or cannot receive email. Check the spelling or use a different address." });
         }
         if (!/^\d{6}$/.test(code)) {
             return res.status(400).json({ message: "Enter the 6-digit code from your email." });
@@ -336,11 +389,14 @@ router.post("/resend-code", async (req, res) => {
         }
         const deliveryStatus = delivered ? await waitForVerificationDelivery(user._id, attemptId) : "pending";
         if (deliveryStatus === "undeliverable") {
-            return res.status(422).json({ message: "This email address was rejected as undeliverable. Check the spelling or use a different email." });
+            return res.status(422).json({ message: "This email address does not exist or cannot receive email. Check the spelling or use a different address." });
+        }
+        if (process.env.BREVO_API_KEY && deliveryStatus !== "delivered") {
+            return res.status(503).json({ message: "We couldn't confirm that this inbox can receive email. Please try again shortly or use a different address." });
         }
         res.status(200).json({
             message: "A new code is on its way.",
-            attemptId: process.env.BREVO_WEBHOOK_TOKEN ? attemptId : null,
+            attemptId: process.env.BREVO_API_KEY || process.env.BREVO_WEBHOOK_TOKEN ? attemptId : null,
             ...(devShow && !delivered ? { devCode: code } : {})
         });
     } catch (err) {

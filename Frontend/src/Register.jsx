@@ -52,7 +52,7 @@ export default function Register({ onSwitchToSignIn, setIsAuthenticated }) {
                     setVerificationAttemptId("");
                     setCode("");
                     setStep("details");
-                    setError("This email address was rejected as undeliverable. Check the spelling or use an email address you can access.");
+                    setError("This email address does not exist or cannot receive email. Check the spelling or use a different address.");
                     return;
                 }
                 if (data.status === "delivered" || Date.now() - startedAt >= 60000) return;
