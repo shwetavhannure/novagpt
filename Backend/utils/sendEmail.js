@@ -1,45 +1,81 @@
 import nodemailer from "nodemailer";
 
 /**
- * Sends transactional emails via Resend or SMTP.
+ * Send transactional email through Brevo's HTTPS API first. This works on
+ * Render's free tier, which blocks outbound SMTP ports. Resend is an optional
+ * fallback when an explicitly verified sender is configured. SMTP is kept for
+ * local development (or an explicitly enabled paid production service).
  *
- * Returns true ONLY when a provider accepted the message, false otherwise
- * (nothing configured, or the provider rejected it). Callers that must be sure
- * the mail left the server (email verification codes) check this value.
- *
- * Optional env vars:
- *   RESEND_API_KEY, RESEND_FROM       (default sender: onboarding@resend.dev, which Resend only
- *                                      delivers to the Resend account owner until you verify a domain)
- *   SMTP_USER, SMTP_PASS, SMTP_HOST, SMTP_PORT, SMTP_FROM
- *                                     (defaults to Brevo; for Gmail use SMTP_HOST=smtp.gmail.com,
- *                                      SMTP_PORT=587 and a Google "App password" as SMTP_PASS)
+ * Environment variables:
+ *   BREVO_API_KEY, BREVO_FROM_EMAIL, BREVO_FROM_NAME
+ *   RESEND_API_KEY, RESEND_FROM (optional fallback; RESEND_FROM must be set)
+ *   SMTP_USER, SMTP_PASS, SMTP_HOST, SMTP_PORT, SMTP_FROM (local fallback)
+ *   EMAIL_TIMEOUT_MS (optional; defaults to 8000)
  */
 const sendEmail = async (options) => {
     const html = options.html || `<p>${String(options.message || "").replace(/\n/g, "<br>")}</p>`;
-    // Keep requests bounded in serverless environments. A provider that stalls
-    // should not leave the browser waiting until the function itself times out.
     const providerTimeoutMs = Number(process.env.EMAIL_TIMEOUT_MS) || 8000;
 
-    // 1. Resend API
-    const resendKey = process.env.RESEND_API_KEY && process.env.RESEND_API_KEY.trim();
-    if (resendKey) {
+    // 1. Brevo HTTP API (works on Render free tier).
+    const brevoKey = process.env.BREVO_API_KEY?.trim();
+    const brevoFrom = process.env.BREVO_FROM_EMAIL?.trim();
+    if (brevoKey && brevoFrom) {
+        try {
+            const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+                method: "POST",
+                headers: {
+                    accept: "application/json",
+                    "content-type": "application/json",
+                    "api-key": brevoKey
+                },
+                body: JSON.stringify({
+                    sender: {
+                        name: process.env.BREVO_FROM_NAME?.trim() || "NovaGPT Support",
+                        email: brevoFrom
+                    },
+                    to: [{ email: options.email }],
+                    subject: options.subject,
+                    htmlContent: html
+                }),
+                signal: AbortSignal.timeout(providerTimeoutMs)
+            });
+
+            if (res.ok) {
+                console.log("Email accepted by Brevo API.");
+                return true;
+            }
+            const detail = await res.text().catch(() => "");
+            console.warn(`Brevo rejected the email (${res.status}): ${detail.slice(0, 200)}`);
+        } catch (brevoErr) {
+            console.warn("Brevo API email failed:", brevoErr.message);
+        }
+    } else if (brevoKey && !brevoFrom) {
+        console.warn("Brevo API is configured, but BREVO_FROM_EMAIL is missing.");
+    }
+
+    // 2. Optional Resend fallback. Require an explicit sender so the restricted
+    // onboarding@resend.dev test sender is never used for arbitrary recipients.
+    const resendKey = process.env.RESEND_API_KEY?.trim();
+    const resendFrom = process.env.RESEND_FROM?.trim();
+    if (resendKey && resendFrom) {
         try {
             const res = await fetch("https://api.resend.com/emails", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${resendKey}`
+                    Authorization: `Bearer ${resendKey}`
                 },
                 body: JSON.stringify({
-                    from: process.env.RESEND_FROM || "NovaGPT <onboarding@resend.dev>",
+                    from: resendFrom,
                     to: options.email,
                     subject: options.subject,
                     html
                 }),
                 signal: AbortSignal.timeout(providerTimeoutMs)
             });
+
             if (res.ok) {
-                console.log("Email sent successfully via Resend!");
+                console.log("Email accepted by Resend API.");
                 return true;
             }
             const detail = await res.text().catch(() => "");
@@ -49,10 +85,13 @@ const sendEmail = async (options) => {
         }
     }
 
-    // 2. SMTP
-    const smtpUser = process.env.SMTP_USER && process.env.SMTP_USER.trim();
-    const smtpPass = process.env.SMTP_PASS && process.env.SMTP_PASS.trim();
-    if (smtpUser && smtpPass) {
+    // 3. SMTP fallback for local development. Render free web services block
+    // SMTP ports 25, 465 and 587. Set ALLOW_SMTP_IN_PRODUCTION=true only when
+    // deploying somewhere that permits outbound SMTP.
+    const smtpAllowed = process.env.NODE_ENV !== "production" || process.env.ALLOW_SMTP_IN_PRODUCTION === "true";
+    const smtpUser = process.env.SMTP_USER?.trim();
+    const smtpPass = process.env.SMTP_PASS?.trim();
+    if (smtpAllowed && smtpUser && smtpPass) {
         try {
             const transporter = nodemailer.createTransport({
                 host: (process.env.SMTP_HOST || "smtp-relay.brevo.com").trim(),
@@ -64,20 +103,20 @@ const sendEmail = async (options) => {
             });
 
             await transporter.sendMail({
-                from: process.env.SMTP_FROM || '"NovaGPT Support" <novagpt.support@gmail.com>',
+                from: process.env.SMTP_FROM || brevoFrom || smtpUser,
                 to: options.email,
                 subject: options.subject,
-                html
+                html,
+                text: options.message
             });
-            console.log("Email sent successfully via SMTP!");
+            console.log("Email accepted by SMTP server.");
             return true;
         } catch (smtpErr) {
             console.warn("SMTP email failed:", smtpErr.message);
         }
     }
 
-    // 3. Nothing could deliver it
-    console.log(`[Email Notice] NOT delivered (no working provider). Recipient: ${options.email} | Subject: "${options.subject}"`);
+    console.warn(`[Email Notice] NOT delivered. Recipient: ${options.email} | Subject: "${options.subject}"`);
     return false;
 };
 
