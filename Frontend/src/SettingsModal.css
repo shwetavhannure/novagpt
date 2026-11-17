@@ -280,7 +280,8 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    width: min(100%, 360px);
+    width: fit-content;
+    max-width: 100%;
 }
 
 .exportBtn {
@@ -288,7 +289,9 @@
     align-items: center;
     justify-content: flex-start;
     gap: 10px;
-    width: 100%;
+    width: max-content;
+    min-width: min(300px, 100%);
+    max-width: 100%;
     min-height: 42px;
     padding: 10px 14px;
     box-sizing: border-box;
@@ -313,7 +316,7 @@
 }
 
 @media (max-width: 600px) {
-    .exportActions { width: 100%; }
+    .exportActions { width: fit-content; }
 }
 
 /* Footer Actions */
