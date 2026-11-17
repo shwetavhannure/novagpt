@@ -139,7 +139,7 @@ export default function Register({ onSwitchToSignIn, setIsAuthenticated }) {
                     <h2 className="authTitle">{step === "verify" ? "Verify your email" : "Create account"}</h2>
                     <p className="authSubtitle">
                         {step === "verify"
-                            ? <>We sent a 6-digit code to <strong className="authEmailStrong">{pendingEmail}</strong>. Enter it below to finish creating your account.</>
+                            ? <>If <strong className="authEmailStrong">{pendingEmail}</strong> can receive email, a 6-digit code is on its way. Enter it below to finish creating your account. If it doesn’t arrive, check the address and spam folder, or use a different email.</>
                             : "Create your account to unlock intelligent conversational workflows and project acceleration."}
                     </p>
                 </div>

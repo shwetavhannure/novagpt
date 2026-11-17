@@ -59,7 +59,8 @@ const DOMAIN_TYPOS = {
 };
 
 /**
- * Validates format, blocks disposable domains, and verifies domain DNS MX records.
+ * Validates format, blocks disposable domains, and checks domain DNS mail routing.
+ * This cannot verify that an individual mailbox exists; the signup OTP proves inbox access.
  * Returns { valid: boolean, error?: string }
  */
 export async function validateEmailDeliverability(email) {

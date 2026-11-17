@@ -156,7 +156,7 @@ const handleRegisterUser = async (req, res) => {
         }
 
         res.status(201).json({
-            message: `We sent a 6-digit verification code to ${normalizedEmail}.`,
+            message: `If ${normalizedEmail} can receive email, a 6-digit verification code is on its way.`,
             needsVerification: true,
             email: normalizedEmail
         });
