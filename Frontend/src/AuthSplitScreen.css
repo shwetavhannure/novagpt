@@ -387,7 +387,7 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .authHeroSide {
         display: none;
     }
@@ -416,7 +416,7 @@
 }
 
 /* Short laptop windows: tighten the cards so Sign-Up fits without scrolling */
-@media (min-width: 901px) and (max-height: 820px) {
+@media (min-width: 1025px) and (max-height: 820px) {
     .authFormSide { padding: 1rem 2rem; }
     .authCard { padding: 1.5rem 2rem; }
     .authHeader { margin-bottom: 1rem; }
@@ -428,15 +428,15 @@
 
 /* Original spacing is kept at normal window heights. Only on very short windows (under 700px of page height,
    where the content would otherwise be cut off) the outer padding is trimmed, never the gaps between the boxes. */
-@media (min-width: 901px) and (max-height: 700px) {
+@media (min-width: 1025px) and (max-height: 700px) {
     .authHeroSide { padding-top: 2rem; padding-bottom: 1.5rem; }
     .heroContent { margin: 1rem 0; }
 }
-@media (min-width: 901px) and (max-height: 600px) {
+@media (min-width: 1025px) and (max-height: 600px) {
     .heroDescription { display: none; }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .authFormSide { padding: 1.25rem 1rem; }
 }
 
@@ -495,7 +495,7 @@
     display: none;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .authFormSide { flex-direction: column; }
     .authMobileBrand {
         display: flex;

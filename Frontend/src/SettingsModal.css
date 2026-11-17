@@ -149,6 +149,7 @@
 /* Settings Content Pane - Left aligned */
 .settingsContent {
     flex: 1;
+    min-width: 0;
     padding: 1.5rem 2rem;
     overflow-y: auto;
     display: flex;
@@ -409,4 +410,8 @@
     .modalHeader { padding-top: 0.6rem; padding-bottom: 0.6rem; }
     .modalFooter { padding-top: 0.5rem; padding-bottom: 0.5rem; }
     .settingsContent { padding: 0.75rem 1.25rem; }
+}
+
+@media (hover: none) {
+    .modalCloseBtn { min-width: 40px; min-height: 40px; }
 }

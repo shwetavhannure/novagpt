@@ -481,3 +481,18 @@
     .chatInput { padding-bottom: 0.35rem; }
     .info { display: none; }
 }
+
+@media (hover: none) {
+    .sidebarExpandBtn,
+    .navPromptLibBtn,
+    .userIcon {
+        min-width: 40px;
+        min-height: 40px;
+    }
+    .submitBtn {
+        width: 40px;
+        height: 40px;
+        right: 6px;
+        bottom: 4px;
+    }
+}
