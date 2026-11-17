@@ -205,7 +205,7 @@ function Sidebar() {
 
             {/* Bottom Footer: prompt quota + credit line */}
             <div className="sidebarFooter">
-                <div className="quotaBox" title="Prompts used in the current session block">
+                <div className="quotaBox" title="Prompts used in the current 24-hour block">
                     <div className="quotaBoxRow">
                         <span className="quotaBoxLabel">Prompt Quota</span>
                         <span className="quotaBoxValue">

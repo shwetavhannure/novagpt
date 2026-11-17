@@ -58,7 +58,7 @@ export default function AuthLayout({ children }) {
                             </div>
                             <div className="featureText">
                                 <h4>Intelligent Quota Protection</h4>
-                                <p>Generous 20 prompts per session block with automated reset protection.</p>
+                                <p>20 prompts every 24 hours with an automatic quota reset.</p>
                             </div>
                         </div>
                     </div>

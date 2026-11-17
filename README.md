@@ -11,7 +11,7 @@ NovaGPT is a full-stack AI conversational platform built using the MERN stack an
 - **Account Activation:** Unverified accounts remain pending and cannot log in.
 - **Chat Management:** Create, manage, and delete conversation threads.
 - **Dynamic Chat Titles:** Automatically generates contextual titles for conversations.
-- **Usage Tracking:** Session-based limit of 20 prompts with quota tracking.
+- **Usage Tracking:** 20 prompts per rolling 24-hour block with quota tracking.
 - **Password Recovery:** Secure password-reset functionality through email.
 
 ## 🛠️ Tech Stack

@@ -11,20 +11,39 @@ import { v1 as uuidv1 } from 'uuid';
 import { API_BASE_URL } from './config.js';
 import { VALID_MODELS, DEFAULT_MODEL } from './models.js';
 
+const getTokenExpiration = (token) => {
+  try {
+    const payloadPart = token.split(".")[1];
+    if (!payloadPart) return null;
+    const base64 = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(base64));
+    return Number.isFinite(payload.exp) ? payload.exp * 1000 : null;
+  } catch {
+    return null;
+  }
+};
+
 function App() {
   const isResetPasswordRoute = window.location.pathname.startsWith("/reset-password/");
 
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const token = localStorage.getItem("token");
     const queryParams = new URLSearchParams(window.location.search);
     const urlToken = queryParams.get("token");
+    const token = urlToken || localStorage.getItem("token");
     
     if (urlToken) {
-      localStorage.setItem("token", urlToken);
       window.history.replaceState({}, document.title, window.location.pathname);
-      return true;
     }
-    return !!token;
+
+    const expiresAt = token ? getTokenExpiration(token) : null;
+    if (!expiresAt || expiresAt <= Date.now()) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("novagpt_user");
+      return false;
+    }
+
+    if (urlToken) localStorage.setItem("token", urlToken);
+    return true;
   });
 
   const [authView, setAuthView] = useState("signin"); // "signin", "register", or "forgot"
@@ -40,7 +59,7 @@ function App() {
   const [allThreads, setAllThreads] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
 
-  // Usage Quota & Rate Limit State (20 messages per session block)
+  // Usage quota state (20 messages per rolling 24-hour block)
   const [quota, setQuota] = useState({
     messageCount: 0,
     limit: 20,
@@ -114,6 +133,31 @@ function App() {
       setAuthView("signin");
     }, 2000);
   };
+
+  // JWT expiry is enforced by the API too; this timer also returns an open tab
+  // to sign-in as soon as its seven-day session expires.
+  useEffect(() => {
+    if (!isAuthenticated) return undefined;
+
+    const token = localStorage.getItem("token");
+    const expiresAt = token ? getTokenExpiration(token) : null;
+    if (!expiresAt || expiresAt <= Date.now()) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("novagpt_user");
+      setIsAuthenticated(false);
+      setAuthView("signin");
+      return undefined;
+    }
+
+    const timeout = setTimeout(() => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("novagpt_user");
+      setIsAuthenticated(false);
+      setAuthView("signin");
+    }, expiresAt - Date.now());
+
+    return () => clearTimeout(timeout);
+  }, [isAuthenticated]);
 
   const providerValues = {
     prompt,
