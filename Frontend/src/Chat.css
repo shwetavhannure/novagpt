@@ -160,6 +160,12 @@
     position: relative;
 }
 
+.pendingReply {
+    display: flex;
+    align-items: center;
+    min-height: 24px;
+}
+
 .gptDiv .katex-display {
     margin: 1.8em 0 1.2em 0;
     overflow-x: auto;

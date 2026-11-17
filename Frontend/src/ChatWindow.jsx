@@ -2,7 +2,6 @@ import "./ChatWindow.css";
 import Chat from "./Chat.jsx";
 import { MyContext } from "./MyContext.jsx";
 import { useContext, useState, useEffect, useRef } from "react";
-import { ScaleLoader } from "react-spinners";
 import QuotaBanner from "./QuotaBanner.jsx";
 import SettingsModal from "./SettingsModal.jsx";
 import UpgradeModal from "./UpgradeModal.jsx";
@@ -137,6 +136,8 @@ function ChatWindow() {
         setLoading(true);
         setPrompt("");
         setReply(null);
+        setNewChat(false);
+        setPrevChats(prev => [...prev, { role: "user", content: messageToSend }]);
 
         // Reset textarea height back to single line
         if (textareaRef.current) {
@@ -160,6 +161,12 @@ function ChatWindow() {
             });
 
             if (response.status === 401 || response.status === 403) {
+                setPrevChats(prev => (
+                    prev[prev.length - 1]?.role === "user" && prev[prev.length - 1]?.content === messageToSend
+                        ? prev.slice(0, -1)
+                        : prev
+                ));
+                if (prevChats.length === 0) setNewChat(true);
                 handleLogout();
                 return;
             }
@@ -168,6 +175,12 @@ function ChatWindow() {
 
             // Handle 429 Quota Exceeded from backend
             if (response.status === 429) {
+                setPrevChats(prev => (
+                    prev[prev.length - 1]?.role === "user" && prev[prev.length - 1]?.content === messageToSend
+                        ? prev.slice(0, -1)
+                        : prev
+                ));
+                if (prevChats.length === 0) setNewChat(true);
                 setError(res.message || "You've reached your limit of 20 prompts.");
                 if (setQuota) {
                     setQuota(prev => ({
@@ -183,12 +196,7 @@ function ChatWindow() {
             }
 
             if (response.ok) {
-                setNewChat(false);
-                setPrevChats(prev => [
-                    ...prev,
-                    { role: "user", content: messageToSend },
-                    { role: "assistant", content: res.reply }
-                ]);
+                setPrevChats(prev => [...prev, { role: "assistant", content: res.reply }]);
                 setReply(res.reply);
 
                 if (res.quota && setQuota) {
@@ -209,11 +217,23 @@ function ChatWindow() {
                     });
                 }
             } else {
+                setPrevChats(prev => (
+                    prev[prev.length - 1]?.role === "user" && prev[prev.length - 1]?.content === messageToSend
+                        ? prev.slice(0, -1)
+                        : prev
+                ));
+                if (prevChats.length === 0) setNewChat(true);
                 setError(res.error || res.message || "Something went wrong. Please try again.");
                 setPrompt(messageToSend);
             }
         } catch (err) {
             console.error("Network error:", err);
+            setPrevChats(prev => (
+                prev[prev.length - 1]?.role === "user" && prev[prev.length - 1]?.content === messageToSend
+                    ? prev.slice(0, -1)
+                    : prev
+            ));
+            if (prevChats.length === 0) setNewChat(true);
             setError("Cannot reach the server. Check that the backend is running on port 5001.");
             setPrompt(messageToSend);
         } finally {
@@ -354,13 +374,6 @@ function ChatWindow() {
 
             {/* Chat Body & Messages */}
             <Chat onOpenPromptLibrary={() => setIsPromptLibraryOpen(true)} />
-
-            {/* Scale Loader when thinking */}
-            {loading && (
-                <div className="windowLoader">
-                    <ScaleLoader color="#339cff" height={18} width={3} radius={2} margin={2} />
-                </div>
-            )}
 
             {/* Bottom Chat Input Section */}
             <div className="chatInput">

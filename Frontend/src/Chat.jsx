@@ -9,10 +9,11 @@ import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css"; 
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
+import { ScaleLoader } from "react-spinners";
 import { PROMPT_TEMPLATES } from "./PromptLibraryModal.jsx";
 
 function Chat({ onOpenPromptLibrary }) {
-    const { newChat, prevChats, reply, setPrompt } = useContext(MyContext);
+    const { newChat, prevChats, reply, setPrompt, loading } = useContext(MyContext);
     const [latestReply, setLatestReply] = useState(null);
     const chatEndRef = useRef(null);
 
@@ -95,43 +96,30 @@ function Chat({ onOpenPromptLibrary }) {
             )}
 
             {/* Conversation Messages */}
-            {!isChatEmpty && prevChats?.slice(0, -1).map((chat, idx) => (
-                <div className={chat.role === "user" ? "userDiv" : "gptDiv"} key={idx}>
-                    {chat.role === "user" ? (
-                        <p className="userMessage">{chat.content}</p>
-                    ) : (
-                        <ReactMarkdown 
-                            remarkPlugins={[remarkGfm, remarkMath]} 
-                            rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeKatex]}
-                        >
-                            {formatContent(chat.content)}
-                        </ReactMarkdown>
-                    )}
-                </div>
-            ))}
+            {!isChatEmpty && prevChats?.map((chat, idx) => {
+                const isLatestAssistant = chat.role === "assistant" && idx === prevChats.length - 1;
+                const content = isLatestAssistant && latestReply !== null ? latestReply : chat.content;
 
-            {!isChatEmpty && prevChats.length > 0 && (
-                <>
-                    {latestReply === null ? (
-                        <div className="gptDiv" key="non-typing">
-                            <ReactMarkdown 
-                                remarkPlugins={[remarkGfm, remarkMath]} 
+                return (
+                    <div className={chat.role === "user" ? "userDiv" : "gptDiv"} key={`${chat.role}-${idx}`}>
+                        {chat.role === "user" ? (
+                            <p className="userMessage">{chat.content}</p>
+                        ) : (
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm, remarkMath]}
                                 rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeKatex]}
                             >
-                                {formatContent(prevChats[prevChats.length - 1].content)}
+                                {formatContent(content)}
                             </ReactMarkdown>
-                        </div>
-                    ) : (
-                        <div className="gptDiv" key="typing">
-                            <ReactMarkdown 
-                                remarkPlugins={[remarkGfm, remarkMath]} 
-                                rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeKatex]}
-                            >
-                                {formatContent(latestReply)}
-                            </ReactMarkdown>
-                        </div>
-                    )}
-                </>
+                        )}
+                    </div>
+                );
+            })}
+
+            {!isChatEmpty && loading && prevChats?.[prevChats.length - 1]?.role === "user" && (
+                <div className="gptDiv pendingReply" aria-label="NovaGPT is thinking">
+                    <ScaleLoader color="#339cff" height={18} width={3} radius={2} margin={2} />
+                </div>
             )}
 
             <div ref={chatEndRef} />
